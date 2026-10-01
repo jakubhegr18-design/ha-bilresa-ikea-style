@@ -5,7 +5,7 @@
 Home Assistant blueprint for the IKEA BILRESA scroll wheel (Matter) that behaves like the
 official IKEA button table and adds **white (colour temperature) control**.
 
-[![Import blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2FYOUR_USER%2FYOUR_REPO%2Fblob%2Fmain%2FIkea_bilresa_ikea_style.yaml)
+[![Import blueprint](https://my.home-assistant.io/badges/blueprint_import.svg)](https://my.home-assistant.io/redirect/blueprint_import/?blueprint_url=https%3A%2F%2Fgithub.com%2Fjakubhegr18-design%2Fha-bilresa-ikea-style%2Fblob%2Fmain%2FIkea_bilresa_ikea_style.yaml)
 
 ## Behaviour (per channel)
 

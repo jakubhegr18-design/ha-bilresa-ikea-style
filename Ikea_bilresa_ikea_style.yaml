@@ -221,6 +221,12 @@ blueprint:
           selector:
             number:
               mode: box
+        white_invert_direction:
+          name: Invert white scroll direction
+          description: "off: scroll right = cooler, left = warmer. on: scroll right = warmer, left = cooler"
+          default: false
+          selector:
+            boolean:
         color_hue_step:
           name: Colour step (hue)
           description: "change in hue in degrees for double/triple press (0..360)"
@@ -530,7 +536,7 @@ action:
                                           {% if cur is none %}
                                             {{ var_max_color_temp | int }}
                                           {% else %}
-                                            {% set new = cur + (1 if scroll_direction == 'right' else -1) * var_color_temp_step * scroll_clicks %}
+                                            {% set new = cur + (1 if (scroll_direction == 'right') != var_white_invert else -1) * var_color_temp_step * scroll_clicks %}
                                             {{ ([[new, var_max_color_temp] | min, var_min_color_temp] | max) | int }}
                                           {% endif %}
                           # default: dim
@@ -611,6 +617,7 @@ variables:
   var_min_color_temp: !input min_color_temp
   var_max_color_temp: !input max_color_temp
   var_color_temp_step: !input color_temp_step
+  var_white_invert: !input white_invert_direction
   var_color_hue_step: !input color_hue_step
   var_color_saturation: !input color_saturation
   var_light_transition_duration: !input light_transition_duration

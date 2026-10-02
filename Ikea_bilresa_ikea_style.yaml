@@ -16,6 +16,7 @@ blueprint:
       long-press = switch scroll between dim and white (flash: short = dim, long = white)
     - Speakers: press = play/pause, double = next track, triple = previous track, scroll = volume
     - Plugs: press = on/off
+    - Custom: your own actions for every gesture (like the original blueprint)
     The button under the LED switches the channel (product group) on the remote itself.
 
     No helper scripts needed. Only optional input_boolean helpers for the white mode.
@@ -45,6 +46,7 @@ blueprint:
             lights: press = on/off, double = next colour, triple = previous colour, scroll = dim (or white, see helper below)
             speakers: press = play/pause, double = next track, triple = previous track, scroll = volume
             plugs: press = on/off
+            custom: your own actions for click / double / triple / long-press / scroll (set them below)
           default: lights
           selector:
             select:
@@ -52,6 +54,7 @@ blueprint:
                 - lights
                 - speakers
                 - plugs
+                - custom
         targets_ch1:
           name: "Channel 1: Target entities"
           description: "Lights, media players or switches/plugs (must match the product group)"
@@ -74,9 +77,37 @@ blueprint:
             entity:
               filter:
                 domain: input_boolean
+        click_action_ch1:
+          name: "Channel 1: custom click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        double_click_action_ch1:
+          name: "Channel 1: custom double-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        triple_click_action_ch1:
+          name: "Channel 1: custom triple-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        scroll_action_ch1:
+          name: "Channel 1: custom scroll wheel action"
+          description: |
+            Only for product group <custom>
+            Exposed variables:
+            - <scroll_clicks>: for <instant> mode always 1, for <relaxed> mode number of clicks
+            - <scroll_direction>: 'left' or 'right'
+          default: []
+          selector:
+            action: {}
         long_click_action_ch1:
           name: "Channel 1: extra long-press action"
-          description: "Optional, runs in addition to the white-mode toggle"
+          description: "Optional, runs in addition to the white-mode toggle (for <custom> this is your long-press action)"
           default: []
           selector:
             action: {}
@@ -92,6 +123,7 @@ blueprint:
             lights: press = on/off, double = next colour, triple = previous colour, scroll = dim (or white, see helper below)
             speakers: press = play/pause, double = next track, triple = previous track, scroll = volume
             plugs: press = on/off
+            custom: your own actions for click / double / triple / long-press / scroll (set them below)
           default: speakers
           selector:
             select:
@@ -99,6 +131,7 @@ blueprint:
                 - lights
                 - speakers
                 - plugs
+                - custom
         targets_ch2:
           name: "Channel 2: Target entities"
           description: "Lights, media players or switches/plugs (must match the product group)"
@@ -121,9 +154,37 @@ blueprint:
             entity:
               filter:
                 domain: input_boolean
+        click_action_ch2:
+          name: "Channel 2: custom click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        double_click_action_ch2:
+          name: "Channel 2: custom double-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        triple_click_action_ch2:
+          name: "Channel 2: custom triple-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        scroll_action_ch2:
+          name: "Channel 2: custom scroll wheel action"
+          description: |
+            Only for product group <custom>
+            Exposed variables:
+            - <scroll_clicks>: for <instant> mode always 1, for <relaxed> mode number of clicks
+            - <scroll_direction>: 'left' or 'right'
+          default: []
+          selector:
+            action: {}
         long_click_action_ch2:
           name: "Channel 2: extra long-press action"
-          description: "Optional, runs in addition to the white-mode toggle"
+          description: "Optional, runs in addition to the white-mode toggle (for <custom> this is your long-press action)"
           default: []
           selector:
             action: {}
@@ -139,6 +200,7 @@ blueprint:
             lights: press = on/off, double = next colour, triple = previous colour, scroll = dim (or white, see helper below)
             speakers: press = play/pause, double = next track, triple = previous track, scroll = volume
             plugs: press = on/off
+            custom: your own actions for click / double / triple / long-press / scroll (set them below)
           default: plugs
           selector:
             select:
@@ -146,6 +208,7 @@ blueprint:
                 - lights
                 - speakers
                 - plugs
+                - custom
         targets_ch3:
           name: "Channel 3: Target entities"
           description: "Lights, media players or switches/plugs (must match the product group)"
@@ -168,9 +231,37 @@ blueprint:
             entity:
               filter:
                 domain: input_boolean
+        click_action_ch3:
+          name: "Channel 3: custom click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        double_click_action_ch3:
+          name: "Channel 3: custom double-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        triple_click_action_ch3:
+          name: "Channel 3: custom triple-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        scroll_action_ch3:
+          name: "Channel 3: custom scroll wheel action"
+          description: |
+            Only for product group <custom>
+            Exposed variables:
+            - <scroll_clicks>: for <instant> mode always 1, for <relaxed> mode number of clicks
+            - <scroll_direction>: 'left' or 'right'
+          default: []
+          selector:
+            action: {}
         long_click_action_ch3:
           name: "Channel 3: extra long-press action"
-          description: "Optional, runs in addition to the white-mode toggle"
+          description: "Optional, runs in addition to the white-mode toggle (for <custom> this is your long-press action)"
           default: []
           selector:
             action: {}
@@ -445,6 +536,14 @@ action:
                   - action: homeassistant.toggle
                     target:
                       entity_id: "{{ targets }}"
+              - conditions: "{{ ch_type == 'custom' }}"
+                sequence:
+                  - if: "{{ channel == 'ch1' }}"
+                    then: !input click_action_ch1
+                  - if: "{{ channel == 'ch2' }}"
+                    then: !input click_action_ch2
+                  - if: "{{ channel == 'ch3' }}"
+                    then: !input click_action_ch3
 
       # ---------------- double (next) / triple (previous) ----------------
       - conditions: "{{ is_button and event_type in ['multi_press_2', 'multi_press_3'] }}"
@@ -476,6 +575,23 @@ action:
                       - action: media_player.media_previous_track
                         target:
                           entity_id: "{{ player_targets }}"
+              - conditions: "{{ ch_type == 'custom' }}"
+                sequence:
+                  - if: "{{ step_dir == 1 }}"
+                    then:
+                      - if: "{{ channel == 'ch1' }}"
+                        then: !input double_click_action_ch1
+                      - if: "{{ channel == 'ch2' }}"
+                        then: !input double_click_action_ch2
+                      - if: "{{ channel == 'ch3' }}"
+                        then: !input double_click_action_ch3
+                    else:
+                      - if: "{{ channel == 'ch1' }}"
+                        then: !input triple_click_action_ch1
+                      - if: "{{ channel == 'ch2' }}"
+                        then: !input triple_click_action_ch2
+                      - if: "{{ channel == 'ch3' }}"
+                        then: !input triple_click_action_ch3
 
       # ---------------- long press: toggle dim <-> white ----------------
       - conditions: "{{ is_button and event_type == 'long_press' }}"
@@ -563,6 +679,16 @@ action:
                                         entity_id: "{{ repeat.item }}"
                                       data:
                                         transition: "{{ var_light_transition_duration }}"
+
+              # ---- custom ----
+              - conditions: "{{ ch_type == 'custom' }}"
+                sequence:
+                  - if: "{{ channel == 'ch1' }}"
+                    then: !input scroll_action_ch1
+                  - if: "{{ channel == 'ch2' }}"
+                    then: !input scroll_action_ch2
+                  - if: "{{ channel == 'ch3' }}"
+                    then: !input scroll_action_ch3
 
               # ---- speakers ----
               - conditions: "{{ ch_type == 'speakers' }}"

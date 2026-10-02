@@ -1,0 +1,870 @@
+# IKEA BILRESA scroll wheel - IKEA-style remix
+# Based on "Ikea_bilresa_scroll_wheel" by jhol-byte (original author):
+#   https://gist.github.com/jhol-byte/b2731a4d2476f530d76b9ff409f7f3a4
+#   https://community.home-assistant.io/t/ikea-bilresa-scroll-wheel-blueprint-matter-the-original/965365
+# Trigger logic and entity detection are taken from the original. All credit to jhol-byte.
+blueprint:
+  name: Ikea_bilresa_ikea_style
+  description: |
+    IKEA-style remix of the BILRESA scroll wheel blueprint (Matter) with white (colour temperature) control.
+    Based on "Ikea_bilresa_scroll_wheel" by jhol-byte, all credits to the original author:
+    https://gist.github.com/jhol-byte/b2731a4d2476f530d76b9ff409f7f3a4
+    https://community.home-assistant.io/t/ikea-bilresa-scroll-wheel-blueprint-matter-the-original/965365
+
+    Behaviour per channel (like the official IKEA table):
+    - Lights: press = on/off, double = next colour, triple = previous colour, scroll = dim,
+      long-press = switch scroll between dim and white (flash: short = dim, long = white)
+    - Speakers: press = play/pause, double = next track, triple = previous track, scroll = volume
+    - Plugs: press = on/off
+    - Custom: your own actions for every gesture (like the original blueprint)
+    The button under the LED switches the channel (product group) on the remote itself.
+
+    No helper scripts needed. Only optional input_boolean helpers for the white mode.
+    For <instant> scroll mode the 9 hidden sensor entities of the Bilresa device have to be enabled.
+    Version: 2026-10-01
+  domain: automation
+
+  input:
+    remote:
+      name: Remote
+      description: "Ikea Bilresa scroll wheel remote control"
+      selector:
+        device:
+          filter:
+            manufacturer: IKEA of Sweden
+            model: BILRESA scroll wheel
+            integration: matter
+
+    # ---------- channel 1 ----------
+    channel1_section:
+      name: Channel 1
+      collapsed: false
+      input:
+        type_ch1:
+          name: "Channel 1: Product group"
+          description: |
+            lights: press = on/off, double = next colour, triple = previous colour, scroll = dim (or white, see helper below)
+            speakers: press = play/pause, double = next track, triple = previous track, scroll = volume
+            plugs: press = on/off
+            custom: your own actions for click / double / triple / long-press / scroll (set them below)
+          default: lights
+          selector:
+            select:
+              options:
+                - lights
+                - speakers
+                - plugs
+                - custom
+        targets_ch1:
+          name: "Channel 1: Target entities"
+          description: "Lights, media players or switches/plugs (must match the product group)"
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                domain:
+                  - light
+                  - media_player
+                  - switch
+        white_helper_ch1:
+          name: "Channel 1: White mode helper (input_boolean)"
+          description: |
+            Lights only. Long-press toggles this helper: off = scroll dims, on = scroll changes white (colour temperature).
+            Leave empty = scroll always dims.
+          default:
+          selector:
+            entity:
+              filter:
+                domain: input_boolean
+        click_action_ch1:
+          name: "Channel 1: custom click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        double_click_action_ch1:
+          name: "Channel 1: custom double-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        triple_click_action_ch1:
+          name: "Channel 1: custom triple-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        scroll_action_ch1:
+          name: "Channel 1: custom scroll wheel action"
+          description: |
+            Only for product group <custom>
+            Exposed variables:
+            - <scroll_clicks>: for <instant> mode always 1, for <relaxed> mode number of clicks
+            - <scroll_direction>: 'left' or 'right'
+          default: []
+          selector:
+            action: {}
+        long_click_action_ch1:
+          name: "Channel 1: extra long-press action"
+          description: "Optional, runs in addition to the white-mode toggle (for <custom> this is your long-press action)"
+          default: []
+          selector:
+            action: {}
+
+    # ---------- channel 2 ----------
+    channel2_section:
+      name: Channel 2
+      collapsed: true
+      input:
+        type_ch2:
+          name: "Channel 2: Product group"
+          description: |
+            lights: press = on/off, double = next colour, triple = previous colour, scroll = dim (or white, see helper below)
+            speakers: press = play/pause, double = next track, triple = previous track, scroll = volume
+            plugs: press = on/off
+            custom: your own actions for click / double / triple / long-press / scroll (set them below)
+          default: speakers
+          selector:
+            select:
+              options:
+                - lights
+                - speakers
+                - plugs
+                - custom
+        targets_ch2:
+          name: "Channel 2: Target entities"
+          description: "Lights, media players or switches/plugs (must match the product group)"
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                domain:
+                  - light
+                  - media_player
+                  - switch
+        white_helper_ch2:
+          name: "Channel 2: White mode helper (input_boolean)"
+          description: |
+            Lights only. Long-press toggles this helper: off = scroll dims, on = scroll changes white (colour temperature).
+            Leave empty = scroll always dims.
+          default:
+          selector:
+            entity:
+              filter:
+                domain: input_boolean
+        click_action_ch2:
+          name: "Channel 2: custom click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        double_click_action_ch2:
+          name: "Channel 2: custom double-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        triple_click_action_ch2:
+          name: "Channel 2: custom triple-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        scroll_action_ch2:
+          name: "Channel 2: custom scroll wheel action"
+          description: |
+            Only for product group <custom>
+            Exposed variables:
+            - <scroll_clicks>: for <instant> mode always 1, for <relaxed> mode number of clicks
+            - <scroll_direction>: 'left' or 'right'
+          default: []
+          selector:
+            action: {}
+        long_click_action_ch2:
+          name: "Channel 2: extra long-press action"
+          description: "Optional, runs in addition to the white-mode toggle (for <custom> this is your long-press action)"
+          default: []
+          selector:
+            action: {}
+
+    # ---------- channel 3 ----------
+    channel3_section:
+      name: Channel 3
+      collapsed: true
+      input:
+        type_ch3:
+          name: "Channel 3: Product group"
+          description: |
+            lights: press = on/off, double = next colour, triple = previous colour, scroll = dim (or white, see helper below)
+            speakers: press = play/pause, double = next track, triple = previous track, scroll = volume
+            plugs: press = on/off
+            custom: your own actions for click / double / triple / long-press / scroll (set them below)
+          default: plugs
+          selector:
+            select:
+              options:
+                - lights
+                - speakers
+                - plugs
+                - custom
+        targets_ch3:
+          name: "Channel 3: Target entities"
+          description: "Lights, media players or switches/plugs (must match the product group)"
+          default: []
+          selector:
+            entity:
+              multiple: true
+              filter:
+                domain:
+                  - light
+                  - media_player
+                  - switch
+        white_helper_ch3:
+          name: "Channel 3: White mode helper (input_boolean)"
+          description: |
+            Lights only. Long-press toggles this helper: off = scroll dims, on = scroll changes white (colour temperature).
+            Leave empty = scroll always dims.
+          default:
+          selector:
+            entity:
+              filter:
+                domain: input_boolean
+        click_action_ch3:
+          name: "Channel 3: custom click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        double_click_action_ch3:
+          name: "Channel 3: custom double-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        triple_click_action_ch3:
+          name: "Channel 3: custom triple-click action"
+          description: "Only for product group <custom>"
+          default: []
+          selector:
+            action: {}
+        scroll_action_ch3:
+          name: "Channel 3: custom scroll wheel action"
+          description: |
+            Only for product group <custom>
+            Exposed variables:
+            - <scroll_clicks>: for <instant> mode always 1, for <relaxed> mode number of clicks
+            - <scroll_direction>: 'left' or 'right'
+          default: []
+          selector:
+            action: {}
+        long_click_action_ch3:
+          name: "Channel 3: extra long-press action"
+          description: "Optional, runs in addition to the white-mode toggle (for <custom> this is your long-press action)"
+          default: []
+          selector:
+            action: {}
+
+    # ---------- global settings ----------
+    global_light_setting:
+      name: Global light settings
+      collapsed: true
+      input:
+        dim_step_pct:
+          name: Dimmer step percentage
+          description: "change in brightness in % per scroll click"
+          default: 10
+          selector:
+            number:
+              mode: box
+        dim_min_pct:
+          name: Minimum brightness
+          description: "minimum brightness in % when dimming down"
+          default: 5
+          selector:
+            number:
+              mode: box
+        dim_turns_lights_on:
+          name: Dim turns lights on
+          description: "allow scrolling right (dim mode) to turn lights on"
+          default: false
+          selector:
+            boolean:
+        min_color_temp:
+          name: Minimum color temperature
+          description: "warmest white in K"
+          default: 2200
+          selector:
+            number:
+              mode: box
+        max_color_temp:
+          name: Maximum color temperature
+          description: "coolest white in K"
+          default: 4000
+          selector:
+            number:
+              mode: box
+        color_temp_step:
+          name: Color temperature step
+          description: "change in K per scroll click (white mode)"
+          default: 100
+          selector:
+            number:
+              mode: box
+        white_invert_direction:
+          name: Invert white scroll direction
+          description: "off: scroll right = cooler, left = warmer. on: scroll right = warmer, left = cooler"
+          default: false
+          selector:
+            boolean:
+        color_hue_step:
+          name: Colour step (hue)
+          description: "change in hue in degrees for double/triple press (0..360)"
+          default: 30
+          selector:
+            number:
+              mode: box
+        color_saturation:
+          name: Color saturation
+          description: "saturation in % used for double/triple press colours"
+          default: 100
+          selector:
+            number:
+              mode: box
+        light_transition_duration:
+          name: Transition duration
+          default: 0.5
+          selector:
+            number:
+              mode: box
+        flash_on_mode_change:
+          name: Flash light when switching dim/white mode
+          description: "short flash = dim mode, long flash = white mode"
+          default: true
+          selector:
+            boolean:
+
+    global_media_setting:
+      name: Global media settings
+      collapsed: true
+      input:
+        volume_step_pct:
+          name: Media player volume step percentage
+          default: 3.5
+          selector:
+            number:
+              mode: box
+        volume_use_up_down_for_instant:
+          name: "Use volume_up/volume_down for <instant> scroll mode"
+          default: true
+          selector:
+            boolean:
+        volume_max_pct:
+          name: Media player max volume percentage
+          default: 70
+          selector:
+            number:
+              mode: box
+
+    global_misc_setting:
+      name: Miscellaneous settings
+      collapsed: true
+      input:
+        scroll_eval_mode:
+          name: Scroll wheel evaluation mode
+          description: |
+            <relaxed>: one action call after scrolling
+            <instant>: many action calls while scrolling (needs the 9 hidden sensor entities enabled)
+          default: relaxed
+          selector:
+            select:
+              options:
+                - relaxed
+                - instant
+        auto_reset_white_mode_time:
+          name: Auto reset white mode (seconds)
+          description: "if > 0: white mode helpers are switched off after this idle time"
+          default: 0
+          selector:
+            number:
+              mode: box
+              step: 60
+        max_queued_automation_calls:
+          name: Max queued automation calls
+          default: 10
+          selector:
+            number:
+              mode: box
+              step: 1
+
+# ===================== automation logic =====================
+alias: Ikea_bilresa_scroll_wheel
+trigger:
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_button_ch1 }}"
+    trigger: event
+    id: button_ch1
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_left_ch1 }}"
+    trigger: event
+    id: scroll_left_ch1
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_right_ch1 }}"
+    trigger: event
+    id: scroll_right_ch1
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_left_ext_ch1 }}"
+    trigger: event
+    id: scroll_left_ext_ch1
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_right_ext_ch1 }}"
+    trigger: event
+    id: scroll_right_ext_ch1
+
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_button_ch2 }}"
+    trigger: event
+    id: button_ch2
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_left_ch2 }}"
+    trigger: event
+    id: scroll_left_ch2
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_right_ch2 }}"
+    trigger: event
+    id: scroll_right_ch2
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_left_ext_ch2 }}"
+    trigger: event
+    id: scroll_left_ext_ch2
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_right_ext_ch2 }}"
+    trigger: event
+    id: scroll_right_ext_ch2
+
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_button_ch3 }}"
+    trigger: event
+    id: button_ch3
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_left_ch3 }}"
+    trigger: event
+    id: scroll_left_ch3
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_right_ch3 }}"
+    trigger: event
+    id: scroll_right_ch3
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_left_ext_ch3 }}"
+    trigger: event
+    id: scroll_left_ext_ch3
+  - event_type: state_changed
+    event_data:
+      entity_id: "{{ var_scroll_right_ext_ch3 }}"
+    trigger: event
+    id: scroll_right_ext_ch3
+
+
+
+condition:
+  - condition: template
+    value_template: >-
+      {{ trigger.event.data.old_state is not none
+         and trigger.event.data.new_state is not none
+         and trigger.event.data.old_state.state != 'unavailable'
+         and trigger.event.data.new_state.state != 'unavailable' }}
+
+action:
+  # auto reset of white mode helpers after idle time
+  - if: "{{ var_white_reset_time > 0 and last_triggered_seconds > var_white_reset_time }}"
+    then:
+      - repeat:
+          for_each:
+            - ch1
+            - ch2
+            - ch3
+          sequence:
+            - if: "{{ vars['white_helper_' ~ repeat.item] is string and vars['white_helper_' ~ repeat.item] | length > 0 }}"
+              then:
+                - action: input_boolean.turn_off
+                  target:
+                    entity_id: "{{ vars['white_helper_' ~ repeat.item] }}"
+
+  - variables:
+      channel: "{{ trigger.id.split('_')[-1] }}"
+      is_button: "{{ trigger.id.startswith('button_') }}"
+      event_type: "{{ trigger.event.data.new_state.attributes.event_type | default('', true) }}"
+      ch_type: "{{ vars['type_' ~ channel] }}"
+      targets: "{{ vars['targets_' ~ channel] }}"
+      light_targets: "{{ targets | select('search', '^light[.]') | list }}"
+      player_targets: "{{ targets | select('search', '^media_player[.]') | list }}"
+      white_helper: "{{ vars['white_helper_' ~ channel] }}"
+      white_mode: "{{ white_helper is string and white_helper | length > 0 and is_state(white_helper, 'on') }}"
+
+  - choose:
+      # ---------------- single press ----------------
+      - conditions: "{{ is_button and event_type == 'multi_press_1' }}"
+        sequence:
+          - choose:
+              - conditions: "{{ ch_type == 'lights' and light_targets | length > 0 }}"
+                sequence:
+                  - action: light.toggle
+                    target:
+                      entity_id: "{{ light_targets }}"
+              - conditions: "{{ ch_type == 'speakers' and player_targets | length > 0 }}"
+                sequence:
+                  - action: media_player.media_play_pause
+                    target:
+                      entity_id: "{{ player_targets }}"
+              - conditions: "{{ ch_type == 'plugs' and targets | length > 0 }}"
+                sequence:
+                  - action: homeassistant.toggle
+                    target:
+                      entity_id: "{{ targets }}"
+              - conditions: "{{ ch_type == 'custom' }}"
+                sequence:
+                  - if: "{{ channel == 'ch1' }}"
+                    then: !input click_action_ch1
+                  - if: "{{ channel == 'ch2' }}"
+                    then: !input click_action_ch2
+                  - if: "{{ channel == 'ch3' }}"
+                    then: !input click_action_ch3
+
+      # ---------------- double (next) / triple (previous) ----------------
+      - conditions: "{{ is_button and event_type in ['multi_press_2', 'multi_press_3'] }}"
+        sequence:
+          - variables:
+              step_dir: "{{ 1 if event_type == 'multi_press_2' else -1 }}"
+          - choose:
+              - conditions: "{{ ch_type == 'lights' and light_targets | length > 0 }}"
+                sequence:
+                  - repeat:
+                      for_each: "{{ light_targets }}"
+                      sequence:
+                        - action: light.turn_on
+                          target:
+                            entity_id: "{{ repeat.item }}"
+                          data:
+                            transition: "{{ var_light_transition_duration }}"
+                            hs_color: >-
+                              {% set h = (state_attr(repeat.item, 'hs_color') or [0, 0])[0] %}
+                              {{ [(h + step_dir * var_color_hue_step) % 360, var_color_saturation] }}
+              - conditions: "{{ ch_type == 'speakers' and player_targets | length > 0 }}"
+                sequence:
+                  - if: "{{ step_dir == 1 }}"
+                    then:
+                      - action: media_player.media_next_track
+                        target:
+                          entity_id: "{{ player_targets }}"
+                    else:
+                      - action: media_player.media_previous_track
+                        target:
+                          entity_id: "{{ player_targets }}"
+              - conditions: "{{ ch_type == 'custom' }}"
+                sequence:
+                  - if: "{{ step_dir == 1 }}"
+                    then:
+                      - if: "{{ channel == 'ch1' }}"
+                        then: !input double_click_action_ch1
+                      - if: "{{ channel == 'ch2' }}"
+                        then: !input double_click_action_ch2
+                      - if: "{{ channel == 'ch3' }}"
+                        then: !input double_click_action_ch3
+                    else:
+                      - if: "{{ channel == 'ch1' }}"
+                        then: !input triple_click_action_ch1
+                      - if: "{{ channel == 'ch2' }}"
+                        then: !input triple_click_action_ch2
+                      - if: "{{ channel == 'ch3' }}"
+                        then: !input triple_click_action_ch3
+
+      # ---------------- long press: toggle dim <-> white ----------------
+      - conditions: "{{ is_button and event_type == 'long_press' }}"
+        sequence:
+          - if: "{{ ch_type == 'lights' and white_helper is string and white_helper | length > 0 }}"
+            then:
+              - action: input_boolean.toggle
+                target:
+                  entity_id: "{{ white_helper }}"
+              - if: "{{ var_flash_on_mode_change and (light_targets | select('is_state', 'on') | list | length) > 0 }}"
+                then:
+                  - action: light.turn_on
+                    continue_on_error: true
+                    target:
+                      entity_id: "{{ light_targets | select('is_state', 'on') | list }}"
+                    data:
+                      flash: "{{ 'short' if white_mode else 'long' }}"
+          - if: "{{ channel == 'ch1' }}"
+            then: !input long_click_action_ch1
+          - if: "{{ channel == 'ch2' }}"
+            then: !input long_click_action_ch2
+          - if: "{{ channel == 'ch3' }}"
+            then: !input long_click_action_ch3
+
+      # ---------------- scroll wheel ----------------
+      - conditions: >-
+          {{ not is_button and (
+               (var_scroll_eval_mode == 'relaxed' and 'ext' not in trigger.id)
+               or (var_scroll_eval_mode == 'instant' and 'ext' in trigger.id
+                   and trigger.event.data.new_state.state == '1')
+             ) }}
+        sequence:
+          - variables:
+              scroll_clicks: >-
+                {{ (trigger.event.data.new_state.attributes.totalNumberOfPressesCounted | int(1))
+                   if var_scroll_eval_mode == 'relaxed' else 1 }}
+              scroll_direction: "{{ 'left' if 'scroll_left' in trigger.id else 'right' }}"
+          - choose:
+              # ---- lights ----
+              - conditions: "{{ ch_type == 'lights' }}"
+                sequence:
+                  - repeat:
+                      for_each: "{{ light_targets }}"
+                      sequence:
+                        - choose:
+                            # white mode: colour temperature
+                            - conditions: "{{ white_mode }}"
+                              sequence:
+                                - if: "{{ is_state(repeat.item, 'on') }}"
+                                  then:
+                                    - action: light.turn_on
+                                      target:
+                                        entity_id: "{{ repeat.item }}"
+                                      data:
+                                        transition: "{{ var_light_transition_duration }}"
+                                        color_temp_kelvin: >-
+                                          {% set cur = state_attr(repeat.item, 'color_temp_kelvin') %}
+                                          {% if cur is none %}
+                                            {{ var_max_color_temp | int }}
+                                          {% else %}
+                                            {% set new = cur + (1 if (scroll_direction == 'right') != var_white_invert else -1) * var_color_temp_step * scroll_clicks %}
+                                            {{ ([[new, var_max_color_temp] | min, var_min_color_temp] | max) | int }}
+                                          {% endif %}
+                          # default: dim
+                          default:
+                            - choose:
+                                - conditions: "{{ is_state(repeat.item, 'on') }}"
+                                  sequence:
+                                    - action: light.turn_on
+                                      target:
+                                        entity_id: "{{ repeat.item }}"
+                                      data:
+                                        transition: "{{ var_light_transition_duration }}"
+                                        brightness_step_pct: >-
+                                          {% set bpct = (state_attr(repeat.item, 'brightness') | float(0)) * 100 / 255 %}
+                                          {% if scroll_direction == 'right' %}
+                                            {{ scroll_clicks * var_dim_step_pct }}
+                                          {% else %}
+                                            {{ -1 * ([[scroll_clicks * var_dim_step_pct, bpct - var_min_pct] | min, 0] | max) }}
+                                          {% endif %}
+                                - conditions: "{{ var_dim_turns_lights_on and scroll_direction == 'right' }}"
+                                  sequence:
+                                    - action: light.turn_on
+                                      target:
+                                        entity_id: "{{ repeat.item }}"
+                                      data:
+                                        transition: "{{ var_light_transition_duration }}"
+
+              # ---- custom ----
+              - conditions: "{{ ch_type == 'custom' }}"
+                sequence:
+                  - if: "{{ channel == 'ch1' }}"
+                    then: !input scroll_action_ch1
+                  - if: "{{ channel == 'ch2' }}"
+                    then: !input scroll_action_ch2
+                  - if: "{{ channel == 'ch3' }}"
+                    then: !input scroll_action_ch3
+
+              # ---- speakers ----
+              - conditions: "{{ ch_type == 'speakers' }}"
+                sequence:
+                  - repeat:
+                      for_each: "{{ player_targets }}"
+                      sequence:
+                        - if: "{{ is_state(repeat.item, 'playing') or is_state(repeat.item, 'on') }}"
+                          then:
+                            - if: "{{ var_scroll_eval_mode == 'relaxed' or not var_volume_use_up_down_for_instant }}"
+                              then:
+                                - action: media_player.volume_set
+                                  target:
+                                    entity_id: "{{ repeat.item }}"
+                                  data:
+                                    volume_level: >-
+                                      {{ [[(state_attr(repeat.item, 'volume_level') | float(0)) * 100
+                                           + (1 if scroll_direction == 'right' else -1) * scroll_clicks * var_volume_step_pct,
+                                           var_volume_max_pct] | min, 0] | max / 100 }}
+                              else:
+                                - if: "{{ scroll_direction == 'left' }}"
+                                  then:
+                                    - action: media_player.volume_down
+                                      target:
+                                        entity_id: "{{ repeat.item }}"
+                                  else:
+                                    - if: "{{ (state_attr(repeat.item, 'volume_level') | float(0)) * 100 < var_volume_max_pct }}"
+                                      then:
+                                        - action: media_player.volume_up
+                                          target:
+                                            entity_id: "{{ repeat.item }}"
+
+mode: queued
+max: !input max_queued_automation_calls
+max_exceeded: silent
+
+variables:
+  vars:
+    type_ch1: !input type_ch1
+    type_ch2: !input type_ch2
+    type_ch3: !input type_ch3
+    targets_ch1: !input targets_ch1
+    targets_ch2: !input targets_ch2
+    targets_ch3: !input targets_ch3
+    white_helper_ch1: !input white_helper_ch1
+    white_helper_ch2: !input white_helper_ch2
+    white_helper_ch3: !input white_helper_ch3
+
+  var_dim_step_pct: !input dim_step_pct
+  var_min_pct: !input dim_min_pct
+  var_dim_turns_lights_on: !input dim_turns_lights_on
+  var_min_color_temp: !input min_color_temp
+  var_max_color_temp: !input max_color_temp
+  var_color_temp_step: !input color_temp_step
+  var_white_invert: !input white_invert_direction
+  var_color_hue_step: !input color_hue_step
+  var_color_saturation: !input color_saturation
+  var_light_transition_duration: !input light_transition_duration
+  var_flash_on_mode_change: !input flash_on_mode_change
+  var_volume_step_pct: !input volume_step_pct
+  var_volume_use_up_down_for_instant: !input volume_use_up_down_for_instant
+  var_volume_max_pct: !input volume_max_pct
+  var_scroll_eval_mode: !input scroll_eval_mode
+  var_white_reset_time: !input auto_reset_white_mode_time
+
+  last_triggered_seconds: >
+    {{ as_timestamp(now()) - as_timestamp(this.attributes.last_triggered, 0) }}
+
+trigger_variables:
+  var_remote: !input remote
+  
+  # get all event names from device_id only
+  var_button_ch1: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^event\..+[a-zA-Z]_3.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_left_ch1: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^event\..+[a-zA-Z]_2.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_right_ch1: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^event\..+[a-zA-Z]_1.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_left_ext_ch1: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^sensor\..+[a-zA-Z]_2.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_right_ext_ch1: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^sensor\..+[a-zA-Z]_1.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+
+  var_button_ch2: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^event\..+[a-zA-Z]_6.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_left_ch2: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^event\..+[a-zA-Z]_5.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_right_ch2: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^event\..+[a-zA-Z]_4.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_left_ext_ch2: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^sensor\..+[a-zA-Z]_5.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_right_ext_ch2: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^sensor\..+[a-zA-Z]_4.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+
+  var_button_ch3: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^event\..+[a-zA-Z]_9.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_left_ch3: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^event\..+[a-zA-Z]_8.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_right_ch3: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^event\..+[a-zA-Z]_7.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_left_ext_ch3: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^sensor\..+[a-zA-Z]_8.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}
+  var_scroll_right_ext_ch3: >-
+    {% for item in device_entities(var_remote) %}
+    {% set match = item | regex_findall(find='^sensor\..+[a-zA-Z]_7.*$') %}
+    {% if (match | length) > 0 %}
+      {{ match[0] }}
+    {% endif %}
+    {% endfor %}

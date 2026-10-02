@@ -14,6 +14,7 @@ official IKEA button table and adds **white (colour temperature) control**.
 | Lights | on/off | next colour | previous colour | dim **or white** | switch scroll dim ↔ white |
 | Speakers | play/pause | next track | previous track | volume | optional custom action |
 | Plugs | on/off | – | – | – | optional custom action |
+| Custom | your action | your action | your action | your action | your action |
 
 The button under the LED switches channels on the remote itself.
 When switching dim/white the lights flash: short = dim, long = white.
